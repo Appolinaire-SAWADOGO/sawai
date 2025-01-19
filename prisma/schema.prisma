@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// prisma/schema.prisma
+datasource db {
+  provider  = "postgresql"
+  url  	    = env("DATABASE_URL")
+  // uncomment next line if you use Prisma <5.10
+  // directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+enum Who {
+  YOU
+  Ai
+}
+
+
+model User {
+  id   String  @id @default(uuid()) @unique
+  name   String    @unique
+  email  String    @unique
+  toDayRequest  Int @default(0)
+
+  contentGenerator ContentGenerator[]
+  audioGenerator AudioGenerator[]
+  imageGenerator ImageGenerator[]
+  requestGestion  RequestGestion?
+}
+
+model ContentGenerator {
+  id   String  @id @default(uuid()) @unique
+  who  Who
+  content String
+
+  userId  String
+  user User @relation(fields: [userId] , references: [id] , onDelete: Cascade)
+
+  dateTime  DateTime @default(now())
+}
+model AudioGenerator {
+  id   String  @id @default(uuid()) @unique
+  who  Who
+  audioUrl String?
+  content String?
+
+  userId  String
+  user User @relation(fields: [userId] , references: [id] , onDelete: Cascade)
+
+  dateTime  DateTime @default(now())
+
+}
+model ImageGenerator {
+  id   String  @id @default(uuid()) @unique
+  who  Who
+  imageUrl String?
+  content String?
+
+  userId  String
+  user User @relation(fields: [userId] , references: [id] , onDelete: Cascade)
+
+  dateTime  DateTime @default(now())
+}
+
+model RequestGestion {
+  id   String  @id @default(uuid()) @unique
+
+  FirstRequestTime  DateTime @default(now())
+  EndRequestTime  DateTime
+
+  userId String @unique
+  user User @relation(fields: [userId] , references: [id] , onDelete: Cascade) 
+}
